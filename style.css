@@ -1,0 +1,97 @@
+header {
+    width: 100%;
+}
+
+a:link{
+    color: black;
+}
+a:hover{
+    color: blue;
+}
+a:visited {
+    color: black;
+}
+
+.header_left {
+    font-size: 35px;
+    font-weight: bold;
+    width: 50%;
+    float: left;
+}
+.header_left > img {
+    height: 100px;
+    padding-left: 20px;
+}
+.header_right{
+    float: right;
+    width: 50%;
+}
+.header_right > img {
+    height: 100px;
+
+}
+.header_right > ul {
+    list-style-type: none;
+    margin: 15px;
+}
+.header_right > ul > li {
+    float: right;
+    padding: 5px;
+}
+.header_right > ul > li > img {
+    max-height:50px;
+    max-width: 50p;
+}
+.content {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    border-top: thin solid gray;
+}
+.left_menu{
+    width: 15%;
+    float: left;
+    border-right: thin solid gray;
+    padding: 50px 30px 20px 0px;
+
+}
+.left_menu > ul{
+    list-style-type: none;
+}
+.left_menu > ul >li {
+    padding: 20px 0px 10px 0px;
+}
+.left_menu > ul >li >a{
+    text-decoration-line: none;
+    text-decoration: none;
+    
+}
+.left_menu > ul >li >a>img{
+    max-width: 30px;
+    max-height: 30px;
+}
+
+.right_content {
+    width: 85%;
+    float: right;
+}
+.center_content {
+    display: flex;
+    display: grid;
+}
+.center_img > img {
+    width: 700px;
+    height: 400px;
+    display: flex;
+    justify-content: center; /* 수평 가운데 정렬 */
+    align-items: center;
+    margin: 20px auto 0px auto;
+}
+
+.card > img {
+    margin-top: 50px;
+    width:  100px;
+    height: 100px;
+    margin: 20px auto 0px auto;
+
+}
