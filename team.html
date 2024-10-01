@@ -29,26 +29,6 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
 
-        const storage = getStorage(app)
-        const imagesRef = ref(storage, '/main_img.png')
-        const url = await getDownloadURL(imagesRef)
-
-        let temp_html = `<img  id='test' src="${url}" alt="">  `
-        $('#center_img').append(temp_html)
-
-
-        for (let index = 1; index < 6; index++) {
-            let fileName = "/sub_img" + index + ".png"
-            const imagesRef = ref(storage, fileName)
-            const url = await getDownloadURL(imagesRef)
-            let temp = `<div class="card">
-                      <img src="${url}" class="card-img-top" alt="...">
-                      <div class="card-body">
-                      </div>
-                   
-                    </div>`
-            $('#cardGroup').append(temp)
-        }
 
     </script>
 </head>
