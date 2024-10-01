@@ -83,6 +83,7 @@ a:visited {
 }
 
 .left_menu>ul>li {
+    font-weight: bold;
     padding: 20px 0px 10px 0px;
 }
 
