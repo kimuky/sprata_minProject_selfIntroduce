@@ -11,7 +11,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script type="module">
         // Import the functions you need from the SDKs you need
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
         import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
         // TODO: Add SDKs for Firebase products that you want to use
         // https://firebase.google.com/docs/web/setup#available-libraries
@@ -28,27 +32,95 @@
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
+        const db = getFirestore()
+        // const db = getFirestore(app);
 
-        const storage = getStorage(app)
-        const imagesRef = ref(storage, '/main_img.png')
-        const url = await getDownloadURL(imagesRef)
-
-        let temp_html = `<img  id='test' src="${url}" alt="">  `
+        const main_img = 'assets/main_img.png'
+        let temp_html = `<img  id='test' src="${main_img}" alt="">  `
         $('#center_img').append(temp_html)
 
+        // firestorage 사용
+        // const storage = getStorage(app)
+        // const imagesRef = ref(storage, '/main_img.png')
+        // const url = await getDownloadURL(imagesRef)
 
-        for (let index = 1; index < 6; index++) {
-            let fileName = "/sub_img" + index + ".png"
-            const imagesRef = ref(storage, fileName)
-            const url = await getDownloadURL(imagesRef)
-            let temp = `<div class="card">
-                      <img src="${url}" class="card-img-top" alt="...">
-                      <div class="card-body">
-                      </div>
-                   
-                    </div>`
-            $('#cardGroup').append(temp)
-        }
+        // let temp_html = `<img  id='test' src="${url}" alt="">  `
+        // $('#center_img').append(temp_html)
+
+
+        // for (let index = 1; index < 6; index++) {
+        //     let fileName = "/sub_img" + index + ".png"
+        //     const imagesRef = ref(storage, fileName)
+        //     const url = await getDownloadURL(imagesRef)
+        //     let temp = `<div class="card">
+        //               <img src="${url}" class="card-img-top" alt="...">
+        //               <div class="card-body">
+        //               </div>
+
+        //             </div>`
+        //     $('#cardGroup').append(temp)
+        // }
+
+        $("#register").click(async function () {
+            $('#modal_container').css('display', 'flex')
+
+        })
+        $("#modal_close_button").click(async function () {
+            $('#modal_container').css('display', 'none')
+
+        })
+
+        $("#modal_input_register").click(async function () {
+            let modal_id = $('#modal_input_id').val()
+            let modal_pw = $('#modal_input_pw').val()
+            let boolean_duplicate = false
+            let docs = await getDocs(collection(db, "users"));
+            docs.forEach((doc) => {
+                let row = doc.data();
+                if (modal_id == row['id']) {
+                    $("#modal_input_id").val('')
+                    $("#modal_input_pw").val('')
+                    boolean_duplicate = true
+                }
+            });
+            if (Boolean(boolean_duplicate)) {
+                alert('중복된 아이디입니다!')
+
+            } else {
+                let doc = {
+                    'id': modal_id,
+                    'pw': modal_pw
+                };
+
+                await addDoc(collection(db, "users"), doc);
+                alert('가입 완료!')
+                $('#modal_container').css('display', 'none')
+
+            }
+        })
+        $("#login_button").click(async function () {
+            let login_id = $('#login_id').val()
+            let login_pw = $('#login_pw').val()
+            let id_check = false
+            let docs = await getDocs(collection(db, "users"));
+            docs.forEach((doc) => {
+                let row = doc.data();
+                if (login_id == row['id']) {
+                    id_check = true
+                    if (login_pw == row['pw']) {
+                        $("#login_box").css('display','none')
+                        alert('로그인 되었습니다.')
+                    } else {
+                        console.log()
+                        alert('비밀번호를 확인해주세요')
+                    }
+                }
+            });
+            if (!Boolean(id_check)) {
+                alert('아이디를 확인해주세요')
+            } 
+        })
+
 
     </script>
 </head>
@@ -72,6 +144,7 @@
 
     <div class="content">
         <div class="left_menu">
+           <div class="session">''님 환영합니다</div> 
             <ul>
                 <li>
                     <a href="index.html">
@@ -100,7 +173,45 @@
         <div class="right_content">
             <div class="center_content">
                 <div id='center_img' class="center_img"></div>
-                <div id='cardGroup' class="card-group">
+                <div id="login_box" class="mypostingbox">
+                    <div class="login">
+                        <h3>Login</h3>
+                    </div>
+                    <div class="input_form">
+                        <label for="html">ID</label>
+                        <input type="text" name="" id="login_id" placeholder="Enter your ID">
+
+                        <label style="padding-left: 50px;" for="html">Password</label>
+                        <input type="password" name="" id="login_pw" placeholder="Enter your Password">
+                        <div class="login_button"><button id="login_button" type="button"
+                                class="btn btn-dark">Login</button></div>
+                        <p id="register" class="register">Register</p>
+                    </div>
+
+                    <div id="modal_container" class="hidden">
+                        <div class="modal_content">
+                            <h3>Register</h3>
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="modal_input_id" placeholder="">
+                                <label for="floatingInput">ID</label>
+                            </div>
+                            <div class="form-floating">
+                                <input type="password" class="form-control" id="modal_input_pw" placeholder="Password">
+                                <label for="floatingPassword">Password</label>
+                            </div>
+                            <div class="button_box">
+                                <div class="button_top_box">
+                                    <button type="button" id="modal_input_register"
+                                        class="btn btn-dark btn-lg">Register</button>
+                                </div>
+                                <div class="button_bottom_box">
+                                    <button id="modal_close_button" type="button" class="btn btn-primary">Close</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
 
                 </div>
             </div>

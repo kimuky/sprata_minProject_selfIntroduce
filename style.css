@@ -2,12 +2,21 @@ header {
     width: 100%;
 }
 
-a:link{
+::placeholder {
+    color: gray;
+    font-size: 12px;
+    font-weight: 400;
+    padding-left: 5px;
+}
+
+a:link {
     color: black;
 }
-a:hover{
+
+a:hover {
     color: blue;
 }
+
 a:visited {
     color: black;
 }
@@ -18,55 +27,72 @@ a:visited {
     width: 50%;
     float: left;
 }
-.header_left > img {
+
+.header_left>img {
     height: 100px;
     padding-left: 20px;
 }
-.header_right{
+
+.header_right {
     float: right;
     width: 50%;
 }
-.header_right > img {
+
+.header_right>img {
     height: 100px;
 
 }
-.header_right > ul {
+
+.header_right>ul {
     list-style-type: none;
     margin: 15px;
 }
-.header_right > ul > li {
+
+.header_right>ul>li {
     float: right;
     padding: 5px;
 }
-.header_right > ul > li > img {
-    max-height:50px;
+
+.header_right>ul>li>img {
+    max-height: 50px;
     max-width: 50p;
 }
+
 .content {
     width: 100%;
     height: 100vh;
     display: flex;
     border-top: thin solid gray;
 }
-.left_menu{
+
+.left_menu {
     width: 15%;
     float: left;
     border-right: thin solid gray;
     padding: 50px 30px 20px 0px;
 
 }
-.left_menu > ul{
+.session {
+    visibility: hidden;
+    font-weight: bold;
+    padding-left: 20px;
+}
+
+.left_menu>ul {
     list-style-type: none;
 }
-.left_menu > ul >li {
+
+.left_menu>ul>li {
     padding: 20px 0px 10px 0px;
 }
-.left_menu > ul >li >a{
+
+.left_menu>ul>li>a {
     text-decoration-line: none;
     text-decoration: none;
-    
+
 }
-.left_menu > ul >li >a>img{
+
+.left_menu>ul>li>a>img {
     max-width: 30px;
     max-height: 30px;
 }
@@ -75,23 +101,126 @@ a:visited {
     width: 85%;
     float: right;
 }
+
 .center_content {
-    display: flex;
     display: grid;
 }
-.center_img > img {
+
+.center_img>img {
     width: 700px;
     height: 400px;
     display: flex;
-    justify-content: center; /* 수평 가운데 정렬 */
+    justify-content: center;
+    /* 수평 가운데 정렬 */
     align-items: center;
     margin: 20px auto 0px auto;
 }
 
-.card > img {
+.card>img {
     margin-top: 50px;
-    width:  100px;
+    width: 100px;
     height: 100px;
     margin: 20px auto 0px auto;
 
+}
+
+.login_box {
+    justify-content: center;
+    align-items: center;
+}
+
+.login>h3 {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.input_form {
+    width: 700px;
+    height: 100px;
+
+    text-align: center;
+    margin: 10px auto 10px auto;
+
+}
+
+.input_form>input {
+    border-width: 0.1px;
+    border-color: gray;
+    border-radius: 10px;
+    margin: 20px auto 20px auto;
+    padding-left: 10px;
+}
+
+.input_form>label {
+    font-weight: bold;
+    padding-right: 5px;
+}
+
+.login_button {
+    text-align: center
+}
+
+.posting_button {
+    display: inline-block;
+
+}
+
+.register {
+    text-decoration: underline;
+    float: right;
+    
+}
+.register:hover{
+    cursor: pointer;
+}
+
+.modal_close_button {
+    cursor: pointer;
+    float: right;
+
+    
+}
+
+#modal_container {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal_content {
+    position: absolute;
+    background-color: #ffffff;
+    width: 400px;
+    height: 400px;
+    padding: 15px;
+    border-radius: 20px;
+}
+
+#modal_container.hidden {
+    display: none;
+}
+.button_box {
+    height: 300px;
+}
+.button_top_box{
+    height: 200px;
+    display: flex; /* Flexbox 사용 */
+    justify-content: center; /* 가로 방향 가운데 정렬 */
+    align-items: center; /* 세로 방향 가운데 정렬 (필요시) */
+    height: 100px; /* 원하는 높이 설정 */
+}
+.button_bottom_box{
+    height: 100px;
+    display: flex;
+    justify-content:right;
+    align-items:flex-end /* 세로 방향 가운데 정렬 (필요시) */
+
+    
 }
