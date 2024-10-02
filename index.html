@@ -18,7 +18,8 @@
         import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
+        import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
         import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
         // TODO: Add SDKs for Firebase products that you want to use
         // https://firebase.google.com/docs/web/setup#available-libraries
@@ -91,14 +92,36 @@
                 alert('중복된 아이디입니다!')
 
             } else {
-                let doc = {
+
+                if (modal_pw == '') {
+                    alert('패스워드를 입력해주세요~')
+                } else {
+
+                    // await addDoc(collection(db, "users"), doc);
+                    try {
+                        const docRef = await addDoc(collection(db, "users"), {
+                            'id': modal_id,
+                            'pw': modal_pw,
+                            'confirm': '0'
+                        });
+                        await updateDoc(doc(db, "users", docRef.id), {
+                            uid: docRef.id
+                        });
+                        console.log("Document written with ID: ", docRef.id);
+                    } catch (e) {
+                        console.error("Error adding document: ", e);
+                    }
+                    alert('가입 완료!')
+                    $('#modal_container').css('display', 'none')
+
+                }
+
+                let doc12 = {
                     'id': modal_id,
                     'pw': modal_pw
                 };
 
-                await addDoc(collection(db, "users"), doc);
-                alert('가입 완료!')
-                $('#modal_container').css('display', 'none')
+
 
             }
         })
@@ -171,7 +194,7 @@
             </ul>
         </div>
         <div class="right_content">
-            <div class="center_content">
+            <div class="main_center_content">
                 <div id='center_img' class="center_img"></div>
                 <div id="login_box" class="mypostingbox">
                     <div class="login">
