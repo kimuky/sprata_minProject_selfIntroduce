@@ -19,47 +19,28 @@ const firebaseConfig = {
     appId: "1:3323501194:web:e162a03ff0d7da51a3ab73"
 };
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// 기초 설정
+const app = initializeApp(firebaseConfig)
 const db = getFirestore()
-// const db = getFirestore(app);
 
+
+// 메인 이미지 설정 -> append말고 그냥 바로 넣는게 좋아보임
 const main_img = 'assets/main_img.png'
 let temp_html = `<img  id='main_img' src="${main_img}" alt="">  `
 $('#center_img').append(temp_html)
 
-
-// firestorage 사용
-// const storage = getStorage(app)
-// const imagesRef = ref(storage, '/main_img.png')
-// const url = await getDownloadURL(imagesRef)
-
-// let temp_html = `<img  id='test' src="${url}" alt="">  `
-// $('#center_img').append(temp_html)
-
-
-// for (let index = 1; index < 6; index++) {
-//     let fileName = "/sub_img" + index + ".png"
-//     const imagesRef = ref(storage, fileName)
-//     const url = await getDownloadURL(imagesRef)
-//     let temp = `<div class="card">
-//               <img src="${url}" class="card-img-top" alt="...">
-//               <div class="card-body">
-//               </div>
-
-//             </div>`
-//     $('#cardGroup').append(temp)
-// }
-
+// 회원가입 모달창 띄우기
 $("#register").click(async function () {
     $('#modal_container').css('display', 'flex')
-
 })
+
+// 훠원가입 모달창 끄기
 $("#modal_close_button").click(async function () {
     $('#modal_container').css('display', 'none')
 
 })
 
+// 회원가입 모달창에서 가입하기 눌렀을 때,
 $("#modal_input_register").click(async function () {
     let modal_id = $('#modal_input_id').val()
     let modal_pw = $('#modal_input_pw').val()
@@ -110,6 +91,8 @@ $("#modal_input_register").click(async function () {
 
     }
 })
+
+// 로그인 버튼 눌렀을 때,
 $("#login_button").click(async function () {
     let login_id = $('#login_id').val()
     let login_pw = $('#login_pw').val()

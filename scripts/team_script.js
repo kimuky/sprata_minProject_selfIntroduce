@@ -4,16 +4,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebas
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-import { setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
 import { query, where, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
+// config
 const firebaseConfig = {
     apiKey: "AIzaSyC_OD-r4PxEoS4nNq6MCWn5_9pU_ZCRfUc",
     authDomain: "spartaprojectintroduce.firebaseapp.com",
@@ -23,13 +20,15 @@ const firebaseConfig = {
     appId: "1:3323501194:web:e162a03ff0d7da51a3ab73"
 };
 
-// Initialize Firebase
+// 설정
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-
+// 쿼리
 const q = query(collection(db, "users"), where("confirm", "==", '1'), orderBy('date'));
 
+
+// 한마디 불러와서 동적으로 데이터 추가
 let docs = await getDocs(q);
 docs.forEach((doc) => {
     let row = doc.data();

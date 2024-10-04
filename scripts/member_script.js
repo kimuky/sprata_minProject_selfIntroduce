@@ -1,17 +1,15 @@
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { doc, updateDoc, deleteField, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-import { setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { getStorage, ref, getDownloadURL, uploadBytes } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 import { query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
+// 설정
 const firebaseConfig = {
     apiKey: "AIzaSyC_OD-r4PxEoS4nNq6MCWn5_9pU_ZCRfUc",
     authDomain: "spartaprojectintroduce.firebaseapp.com",
@@ -21,22 +19,24 @@ const firebaseConfig = {
     appId: "1:3323501194:web:e162a03ff0d7da51a3ab73"
 };
 
-// Initialize Firebase
+// 기초
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const db_img = getStorage(app);
 
-// 유저 전부 조회
-const q1 = query(collection(db, "users"));
+// 유저 전부 조회 (join 등록한 사람)
+const q_select_from_joinUser = query(collection(db, "users"), where("confirm", "==", '1'),);
 
 
-// 조인한 사람만 조회해서 카드로 보여줌
-const q = query(collection(db, "users"), where("confirm", "==", '1'), orderBy("date", "asc"));
+// 유저 전부 조회 (join 등록한 사람) "Join"으로 등록할 때의 시간정보로 오름차순
+const q_select_from_joinUser_where_date_asc = query(collection(db, "users"), where("confirm", "==", '1'), orderBy("date", "asc"));
 
 // 나 찾기
 const q_find_me = query(collection(db, "users"), where("id", "==", sessionStorage.getItem('user_id')));
 
-let docs = await getDocs(q);
+
+// 동적으로 profile 생성
+let docs = await getDocs(q_select_from_joinUser_where_date_asc);
 docs.forEach((doc) => {
     let row = doc.data();
 
@@ -44,7 +44,7 @@ docs.forEach((doc) => {
     else {
         let id = row['id']
 
-        // 여기서 session id 와 들고온 id를 비교하며 세션아이디(현재 로그인한 아이디)가 있으면 현재 로그인한 사용자 페이지에서 join 버튼을 none으로~
+        // 여기서 session id 와 들고온 id를 비교하며 세션아이디(현재 로그인한 아이디)가 있으면 현재 로그인한 사용자 페이지에서 join 버튼을 hidden으로~
         if (id == sessionStorage.getItem('user_id')) {
             $("#join_button").css('visibility', 'hidden')
         }
@@ -81,10 +81,12 @@ docs.forEach((doc) => {
 // 조인 버튼을 눌렀을 시,
 $("#join_button").click(async function () {
 
+    // 세션에 user_id가 있을 때 == 로그인했는지 판별
     if (Boolean(sessionStorage.getItem('user_id'))) {
         $('#modal_container').css('display', 'flex')
         $('#card').css('visibility', 'hidden')
 
+        // join 모달창 안에 join 버튼을 눌렀을 때,
         $("#modal_input_join").click(async function () {
             let name = $("#modal_input_name").val()
             let mbti = $("#modal_input_mbti").val()
@@ -99,23 +101,24 @@ $("#join_button").click(async function () {
                 alert('빈 칸이 있습니다!')
             } else {
 
-                const q = query(collection(db, "users"), where("id", "==", sessionStorage.getItem('user_id')));
+                // 자신의 uid 찾기 = document_id 찾기
+                const q_find_my_uid = query(collection(db, "users"), where("id", "==", sessionStorage.getItem('user_id')));
 
                 // getDocs 함수에 위에 정의한 쿼리를 적용해서 모든 문서들을 가져온다.
-                const querySnapshot = await getDocs(q);
+                const querySnapshot = await getDocs(q_find_my_uid);
                 let find_uid
                 querySnapshot.forEach((doc) => {
                     find_uid = doc.id
                 });
-                // console.log(imgFile['name']);
+
+                // 프로필 이미지를 firestorage에 업로드
                 const profile_img_ref = ref(db_img, `profile/${sessionStorage.getItem('user_id')}`);
                 await uploadBytes(profile_img_ref, imgFile).then((snapshot) => {
                     console.log('Uploaded a blob or file!');
                 })
 
-                // const imagesRef = ref(db_img, `profile/${sessionStorage.getItem('user_id')}`)
-                // const url = await getDownloadURL(imagesRef)
-
+                // 유저 정보에 name,mbti, style, short, confoirm, date 추가
+                // confirm = 0 은 로그인만 한 상태, confirm =1은 로그인 + 프로필 등록
                 await updateDoc(doc(db, "users", find_uid), {
                     name: name,
                     mbti: mbti,
@@ -126,6 +129,7 @@ $("#join_button").click(async function () {
                     date: serverTimestamp()
                 });
 
+                // 모달창 안 input값 초기화
                 name = $("#modal_input_name").val('')
                 mbti = $("#modal_input_mbti").val('')
                 style = $("#modal_input_style").val('')
@@ -133,12 +137,14 @@ $("#join_button").click(async function () {
                 short = $("#modal_input_short").val('')
                 img_input = $("#modal_input_img").val('')
 
+                // 지금 로그인한 사용자 id를 세션스토리지에서 받아와 url을 다운로드해서 user에 url 추가
                 const imagesRef = ref(db_img, `profile/${sessionStorage.getItem('user_id')}`)
                 const url = await getDownloadURL(imagesRef)
                 await updateDoc(doc(db, "users", find_uid), {
                     url: url
                 });
 
+                //  모달창 없애고 카드 보이게, 윈도우 리로딩
                 $('#modal_container').css('display', 'none')
                 $('#card').css('visibility', 'visible')
                 alert('프로필이 정상적으로 저장되었습니다.')
@@ -146,6 +152,7 @@ $("#join_button").click(async function () {
             }
         })
     } else {
+        // 로그인 안하고 눌렀을 때,
         $('#modal_container').css('display', 'none')
         $('#card').css('visibility', 'visible')
         alert('로그인이 필요합니다')
@@ -154,17 +161,14 @@ $("#join_button").click(async function () {
 
 // 각 카드를 클릭했을 때,
 $('#card').on('click', '#member_card', function () {
-    // const cardTitle = $(this).find('.card-title').text();
     const profile_id = $(this).data('id')
     handleClick(profile_id)
 });
 
 async function handleClick(profile_id) {
 
-
     // 해당 프로필의 아이디로 유저 데이터 받아옴
-    // const q = query(collection(db, "users"));
-    let docs = await getDocs(q1);
+    let docs = await getDocs(q_select_from_joinUser);
     let name, mbti, style, link, img = ''
     docs.forEach((doc) => {
         let row = doc.data();
@@ -311,7 +315,6 @@ async function handleUpdateClick() {
 }
 
 // 내 프로필 삭제할 때,
-// 내 프로필 업데이트
 $('#modal_delete').on('click', function () {
     handleDeleteClick()
 });
@@ -361,8 +364,6 @@ async function handleCancelClick() {
     let mbti = $("#mbti_me").val()
     let style = $("#style_me").val()
     let link = $("#url_me").val()
-    let img_input = $("#cur_img")[0]
-    let imgFile = img_input.files[0]
 
     if (mbti == '' || style == '' || link == '' || $("input[type='file']").val() == null) {
         alert('칸을 다 채워주세요')
@@ -373,12 +374,11 @@ async function handleCancelClick() {
         $('#box_mbti_style_url_me').css('display', 'none')
         $('#box_img_file').css('display', 'none');
         $("input[type='file']").val(null)
+        window.location.reload()
 
     }
 
 }
-
-
 
 
 // 로그아웃 버튼을 눌렀을 때,
@@ -386,4 +386,3 @@ $("#logout").click(async function () {
     sessionStorage.clear();
 
 })
-modal_update
