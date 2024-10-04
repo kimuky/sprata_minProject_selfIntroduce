@@ -16,6 +16,7 @@ body{
 }
 a:link {
     color: black;
+    text-decoration: none;
 }
 
 a:hover {
@@ -203,6 +204,25 @@ a:visited {
 .card {
     border-radius: 20px;
 }
+.profile_card_div{
+    padding-top: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+.profile_circle {
+    height: auto;
+    border-radius: 70%;
+
+    /* 원 모양 만들기 */
+    overflow: hidden;
+}
+.profile_cirlce > img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 .card_img {
     width: 30px;
     height: 30px;
@@ -378,6 +398,7 @@ a:visited {
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(3, 1fr);
     grid-gap: 10px 10px;
+
 }
 .box_profile_img {
     background-color: #E5E5E5;
@@ -387,40 +408,32 @@ a:visited {
     border-radius: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-
-
+    padding-top: 20px;
 }
 .box_img {
-    width: 80%;
-    flex: 8; /* 비율 8 */
-    margin: 10px 0; /* 위아래 여백 */
-}
-.box_img_file {
-    display: none;
-    width: 80%;
-
-    flex: 2; /* 비율 2 */
-    margin: 10px 0; /* 위아래 여백 */
-    
+    width: inherit;
 }
 .circle_img {
-    width: 80%; /* div2의 2/3 비율로 설정 */
-    padding-bottom: 100%;
-    border-radius: 70%; /* 원 모양 만들기 */
+    width: 300px; /* div2의 2/3 비율로 설정 */
+    height: 300px;
+    border-radius: 100%; /* 원 모양 만들기 */
     overflow: hidden;
-    margin: 20px auto 20px auto;
-    position: relative;
+    /* margin: 20px auto 20px auto; */
+
+
 }
 .circle_img > img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    position: absolute;
-    top: 0;
-    left: 0;
 }
+.box_img_file {
+    display: none;
+    margin: 10px 0; /* 위아래 여백 */
+    
+}
+
 
 .box_profile_logo_name {
 
@@ -456,6 +469,7 @@ a:visited {
 .box_name {
     font-size: 50px;
     font-weight: bold;
+    opacity: 0.5;
     display: flex; /* 플렉스 레이아웃 활성화 */
     justify-content: center; /* 가로 중앙 정렬 */
     align-items: center; /* 세로 중앙 정렬 */
@@ -465,7 +479,7 @@ a:visited {
 
     background-color: #E5E5E5;
     border-radius: 20px;
-    padding: 10px;
+    padding: 20px;
     grid-column-start: 2;
     grid-row: 2/4;
 }
@@ -475,7 +489,7 @@ a:visited {
 }
 
 .box_mbti_style_url_other {
-    padding: 10px;
+    padding: 20px;
     grid-column-start: 2;
     grid-row: 2/4;
 
@@ -487,7 +501,7 @@ a:visited {
 }
 .other_grid_title {
     display: flex;
-    justify-content: center;
+    justify-content: left;
     align-items: center;
     font-size: 16px; /* 글자 크기 */
     font-weight: bold;
@@ -540,11 +554,10 @@ a:visited {
     justify-content: right;
     align-items: flex-end;
     /* 세로 방향 가운데 정렬 (필요시) */
-
-
 }
 
 #join_button{
+    /* display: none; */
     width: 200px;
     float: right;
 }

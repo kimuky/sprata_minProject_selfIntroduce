@@ -3,7 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebas
 import { getFirestore } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { collection, addDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+import { doc, updateDoc, deleteField, deleteDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { getStorage, ref, getDownloadURL, uploadBytes } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js";
 import { query, where, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
@@ -31,7 +31,10 @@ const q1 = query(collection(db, "users"));
 
 
 // 조인한 사람만 조회해서 카드로 보여줌
-const q = query(collection(db, "users"), where("confirm", "==", '1'));
+const q = query(collection(db, "users"), where("confirm", "==", '1'), orderBy("date", "asc"));
+
+// 나 찾기
+const q_find_me = query(collection(db, "users"), where("id", "==", sessionStorage.getItem('user_id')));
 
 let docs = await getDocs(q);
 docs.forEach((doc) => {
@@ -40,7 +43,6 @@ docs.forEach((doc) => {
     if (row['style'] == '') { return }
     else {
         let id = row['id']
-        console.log(id)
 
         // 여기서 session id 와 들고온 id를 비교하며 세션아이디(현재 로그인한 아이디)가 있으면 현재 로그인한 사용자 페이지에서 join 버튼을 none으로~
         if (id == sessionStorage.getItem('user_id')) {
@@ -54,9 +56,14 @@ docs.forEach((doc) => {
         let link = row['link']
         let img = row['url']
 
-        let temp_html = `                        <div data-id='${id}' class="col" id='member_card'>
+        let temp_html = `                        
+                <div data-id='${id}' class="col" id='member_card'>
                     <div  class="card h-100">
+                    <div class='profile_card_div'> 
+                        <div class='profile_circle'>
                         <img id='profile_img' src="${img}" class="card-img-top" alt="...">
+                        </div>
+                    </div> 
                         <div class="card-body">
                             <h5 class="card-title">${name}</h5>
                             <p class="card-text">${mbti}</p>
@@ -66,7 +73,7 @@ docs.forEach((doc) => {
                         </div>
                     </div>
                 </div>`
-        $('#card').prepend(temp_html);
+        $('#card').append(temp_html);
     }
 
 })
@@ -94,14 +101,12 @@ $("#join_button").click(async function () {
 
                 const q = query(collection(db, "users"), where("id", "==", sessionStorage.getItem('user_id')));
 
-
                 // getDocs 함수에 위에 정의한 쿼리를 적용해서 모든 문서들을 가져온다.
                 const querySnapshot = await getDocs(q);
                 let find_uid
                 querySnapshot.forEach((doc) => {
                     find_uid = doc.id
                 });
-
                 // console.log(imgFile['name']);
                 const profile_img_ref = ref(db_img, `profile/${sessionStorage.getItem('user_id')}`);
                 await uploadBytes(profile_img_ref, imgFile).then((snapshot) => {
@@ -156,9 +161,9 @@ $('#card').on('click', '#member_card', function () {
 
 async function handleClick(profile_id) {
 
+
     // 해당 프로필의 아이디로 유저 데이터 받아옴
     // const q = query(collection(db, "users"));
-
     let docs = await getDocs(q1);
     let name, mbti, style, link, img = ''
     docs.forEach((doc) => {
@@ -179,9 +184,10 @@ async function handleClick(profile_id) {
 
     if (sessionStorage.getItem('user_id') == profile_id) {
         //셋팅
-        $('#mbti_me').attr('value', mbti);
-        $('#style_me').attr('value', style);
-        $('#url_me').attr('value', img);
+        $('#mbti_me').attr('value', mbti)
+        $('#style_me').attr('value', style)
+        $('#url_me').attr('value', link)
+        $('#circle_img').attr('src', img)
 
         // 내 카드일 시, 실행될 곳
         $('#card_modal_container').css('display', 'flex');
@@ -190,23 +196,37 @@ async function handleClick(profile_id) {
         $('#card').css('visibility', 'hidden');
         $('#box_img_file').css('display', 'block');
 
+        $('#cur_img').change(function () {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    $('#circle_img').attr('src', e.target.result).show();
+                }
+                reader.readAsDataURL(file);
+            }
+
+        });
+
+
     } else {
         // 셋팅
         $('#other_grid_mbti').text(mbti)
         $('#other_grid_style').text(style)
-        $('#other_grid_url').text(link)
+        $('#other_grid_url').attr('href', link)
+        $('#circle_img').attr('src', img)
+
         // 남의 카드일 시, 실행될 곳
         $('#card_modal_container').css('display', 'flex');
         $('#card_modal_content').css('display', 'flex');
         $('#box_mbti_style_url_other').css('display', 'grid');
         $('#card').css('visibility', 'hidden');
     }
-    $('#circle_img').attr('src', img)
 
 }
 
 
-// 조인창 껐을 때,gose
+// 조인창 껐을 때,
 $("#modal_close_button").click(async function () {
     $('#modal_container').css('display', 'none')
     $('#card').css('visibility', 'visible')
@@ -218,17 +238,152 @@ $("#modal_close").click(async function () {
     $('#box_mbti_style_url_other').css('display', 'none')
 
 })
-// 나의 프로필을 끌때
-$("#modal_cancel").click(async function () {
+
+// 내 프로필 업데이트
+$('#modal_update').on('click', function () {
+    handleUpdateClick()
+});
+
+async function handleUpdateClick() {
+
+    let mbti = $("#mbti_me").val()
+    let style = $("#style_me").val()
+    let link = $("#url_me").val()
+    let img_input = $("#cur_img")[0]
+    let imgFile = img_input.files[0]
+
+
+    if (mbti == '' || style == '' || link == '') {
+        alert('칸을 다 채워주세요')
+    } else {
+
+        // getDocs 함수에 위에 정의한 쿼리를 적용해서 모든 문서들을 가져온다.
+        let my_id = sessionStorage.getItem('user_id')
+        let find_uid
+
+        // find uid
+        const querySnapshot = await getDocs(q_find_me);
+        querySnapshot.forEach((doc) => {
+            let row = doc.data();
+            let id = row['id']
+            if (my_id == id) {
+                find_uid = row['uid']
+            }
+
+        });
+        // 이미지 수정 여부에 따른 수정 로직 바뀜
+        if (!imgFile) {
+            console.log(mbti, style, link, find_uid)
+            await updateDoc(doc(db, "users", find_uid), {
+                mbti: $("#mbti_me").val(),
+                style: $("#style_me").val(),
+                link: $("#url_me").val()
+            });
+
+        } else {
+
+            // img 레퍼런스 생성
+            const profile_img_ref = ref(db_img, `profile/${my_id}`);
+
+            // img 업로드
+            await uploadBytes(profile_img_ref, imgFile).then((snapshot) => {
+                console.log('Uploaded a blob or file!');
+            })
+
+            // img 다운로드해서 firestre
+            const url = await getDownloadURL(profile_img_ref)
+            // console.log(mbti, style, link, url)
+            await updateDoc(doc(db, "users", find_uid), {
+                mbti: mbti,
+                style: style,
+                link: link,
+                url: url
+            });
+        };
+    }
     $('#card_modal_container').css('display', 'none')
     $('#card').css('visibility', 'visible')
     $('#box_mbti_style_url_me').css('display', 'none')
     $('#box_img_file').css('display', 'none');
+    $("input[type='file']").val(null)
+    alert('프로필이 정상적으로 수정되었습니다.')
+    window.location.reload()
+}
+
+// 내 프로필 삭제할 때,
+// 내 프로필 업데이트
+$('#modal_delete').on('click', function () {
+    handleDeleteClick()
+});
+
+async function handleDeleteClick() {
+
+    let my_id = sessionStorage.getItem('user_id')
+    let find_uid
+    
+    // uid 찾기
+    const querySnapshot = await getDocs(q_find_me);
+    querySnapshot.forEach((doc) => {
+        let row = doc.data();
+        let id = row['id']
+        if (my_id == id) {
+            find_uid = row['uid']
+        }
+    })
+
+    console.log(find_uid)
+    // 멤버 등록 정보만 삭제
+    await updateDoc(doc(db, "users", find_uid), {
+        confirm: '0',
+        date: deleteField(),
+        link: deleteField(),
+        mbti:deleteField(),
+        shor: deleteField(),
+        style: deleteField(),
+        url: deleteField()
+    });
+
+    $('#card_modal_container').css('display', 'none')
+    $('#card').css('visibility', 'visible')
+    $('#box_mbti_style_url_me').css('display', 'none')
+    $('#box_img_file').css('display', 'none');
+    $("input[type='file']").val(null)
+    alert('프로필이 정상적으로 삭제되었습니다.')
+    window.location.reload()
+}
 
 
-})
+// 내 프로필 끌 때,
+$('#modal_cancel').on('click', function () {
+    handleCancelClick()
+});
+async function handleCancelClick() {
+    let mbti = $("#mbti_me").val()
+    let style = $("#style_me").val()
+    let link = $("#url_me").val()
+    let img_input = $("#cur_img")[0]
+    let imgFile = img_input.files[0]
+
+    if (mbti == '' || style == '' || link == '' || $("input[type='file']").val() == null) {
+        alert('칸을 다 채워주세요')
+
+    } else {
+        $('#card_modal_container').css('display', 'none')
+        $('#card').css('visibility', 'visible')
+        $('#box_mbti_style_url_me').css('display', 'none')
+        $('#box_img_file').css('display', 'none');
+        $("input[type='file']").val(null)
+
+    }
+
+}
+
+
+
+
 // 로그아웃 버튼을 눌렀을 때,
 $("#logout").click(async function () {
     sessionStorage.clear();
 
 })
+modal_update

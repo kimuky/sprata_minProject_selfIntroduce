@@ -7,7 +7,7 @@ import { getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-fire
 import { doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { setDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-storage.js";
-import { query, where } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+import { query, where, orderBy } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -28,7 +28,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 
-const q = query(collection(db, "users"), where("confirm", "==", '1'));
+const q = query(collection(db, "users"), where("confirm", "==", '1'), orderBy('date'));
 
 let docs = await getDocs(q);
 docs.forEach((doc) => {
