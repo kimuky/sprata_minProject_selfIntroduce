@@ -69,7 +69,7 @@ docs.forEach((doc) => {
                             <p class="card-text">${mbti}</p>
                         </div>
                         <div class="card-footer">
-                            <small class="text-body-secondary">${link}</small>
+                            <small id='ellipsis_link' class="text-body-secondary"><p>${link}</p></small>
                         </div>
                     </div>
                 </div>`

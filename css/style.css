@@ -27,6 +27,13 @@ a:hover {
     border: 2px solid gray;
 
 }
+#ellipsis_link {
+    white-space: nowrap;
+}
+#ellipsis_link > p {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 a:visited {
     color: black;
 }
